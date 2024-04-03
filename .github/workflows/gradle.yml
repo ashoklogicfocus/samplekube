@@ -20,13 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        approve-user: [true]
-      fail-fast: true
+        approve-user: [false]
+      fail-fast: false
     steps:
       - name: Create User
         id: create-user
         run: echo "User creation logic here"
-        continue-on-error: true
+        continue-on-error: false
       - name: Set Approval Flag
         if: ${{ always() }}
         run: echo "::set-output name=approve-user::false"
@@ -37,7 +37,7 @@ jobs:
       - name: Manual Approval
         id: manual-approval
         run: echo "Awaiting manual approval"
-        continue-on-error: true
+        continue-on-error: false
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
