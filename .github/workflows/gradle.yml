@@ -1,45 +1,54 @@
-name: Manual Approval Workflow
-
+name: User Approval Workflow
 on:
-  pull_request:
+  push:
     branches:
       - master
-
 jobs:
-  build:
-    runs-on: self-hosted
-
+  stage-1-echo:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build
-        run: echo "Building..."
-
-      - name: Approve
-        if: github.actor == 'approved-user'
-        id: approve
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data: pullRequest } = await github.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
-            });
-
-            if (pullRequest.user.login === 'approved-user') {
-              return { approved: true };
-            } else {
-              return { approved: false };
-            }
-
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    if: needs.build.outputs.approve == 'true'
-
+      - name: Echo Stage 1
+        run: echo "Stage 1"
+  stage-2-echo:
+    needs: stage-1-echo
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy
-        run: echo "Deploying..."
+      - name: Echo Stage 2
+        run: echo "Stage 2"
+  stage-3-create-user:
+    needs: stage-2-echo
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        approve-user: [false]
+      fail-fast: false
+    steps:
+      - name: Create User
+        id: create-user
+        run: echo "User creation logic here"
+        continue-on-error: false
+      - name: Set Approval Flag
+        if: ${{ always() }}
+        run: echo "::set-output name=approve-user::true"
+  manual-approval:
+    needs: stage-3-create-user
+    runs-on: self-hosted
+    steps:
+      - name: Manual Approval
+        id: manual-approval
+        run: echo "Awaiting manual approval"
+        continue-on-error: false
+  stage-4-approve:
+    needs: [stage-3-create-user, manual-approval]
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.conclusion == 'success' }}
+    steps:
+      - name: Approve User
+        run: echo "User approved"
+  stage-5-reject:
+    needs: stage-4-approve
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-4-approve.result != 'success' }}
+    steps:
+      - name: Reject User
+        run: echo "User rejected"
