@@ -19,10 +19,17 @@ jobs:
     needs: stage-2-echo
     runs-on: ubuntu-latest
     steps:
-      - name: Create User
+      - name: ashok
         run: |
-          # Script to create user
-          # Assuming it's a placeholder
+         # Your user creation logic here
+      # Add other steps here
+
+      # This step will only run if the previous step's output is 'true'
+      - name: Conditional step
+        if: steps.create-user.outputs.result == 'true'
+        run: |
+          # Your conditional logic here
+          
   stage-4-approve:
     if: failure()
     needs: stage-3-create-user
