@@ -1,7 +1,8 @@
 name: User Approval Workflow
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - master
 
 jobs:
   stage-1-echo:
