@@ -2,7 +2,7 @@ name: User Approval Workflow
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   stage-1-echo:
     runs-on: ubuntu-latest
