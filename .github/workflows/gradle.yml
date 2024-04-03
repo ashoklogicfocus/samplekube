@@ -38,6 +38,8 @@ jobs:
         id: manual-approval
         run: echo "Awaiting manual approval"
         continue-on-error: true
+      - name: Print Output
+        run: echo "Approve User: ${{ needs.stage-3-create-user.outputs.approve-user }}"
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
     runs-on: self-hosted
@@ -48,7 +50,7 @@ jobs:
   stage-5-reject:
     needs: manual-approval
     runs-on: self-hosted
-    if: ${{ needs.manual-approval.outputs.approve-user != 'true' }}
+    if: ${{ needs.manual-approval.outputs.approve-user == 'true' }}
     steps:
       - name: Reject User
         run: echo "User rejected"
