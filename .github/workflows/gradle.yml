@@ -46,7 +46,7 @@ jobs:
   stage-4-run-if-approved:
     needs: manual-approval
     runs-on: ubuntu-latest
-    if: ${{ needs.manual-approval.outputs.result == 'success' }}
+    if: ${{ needs.manual-approval.outputs.result == 'true' }}
     steps:
       - name: Run Stage 4
         run: echo "Stage 4"
