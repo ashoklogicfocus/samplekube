@@ -1,8 +1,10 @@
 name: User Approval Workflow
+
 on:
   push:
     branches:
       - master
+
 jobs:
   stage-1-echo:
     runs-on: ubuntu-latest
@@ -17,12 +19,24 @@ jobs:
       - name: Echo Stage 2
         run: echo "Stage 2"
 
-  staging-approval-gate:
-    needs: stage-2-echo
-    environment: staging
+  create-user:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     steps:
-      - name: approved
-        env: 
-          ENV_NAME: ashok
-        run: write-host "Approve for $(NPM_TOKEN)"
+      - name: Create User
+        run: echo "User created"
+      - name: Request Approval
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.repos.createStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: github.sha,
+              state: 'pending',
+              context: 'manual-approval',
+              description: 'Waiting for approval',
+              target_url: 'https://example.com'
+            })
+
