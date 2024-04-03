@@ -30,10 +30,18 @@ jobs:
       - name: Set Approval Flag
         if: ${{ always() }}
         run: echo "::set-output name=approve-user::false"
-  stage-4-approve:
+  manual-approval:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
+    steps:
+      - name: Manual Approval
+        id: manual-approval
+        run: echo "Awaiting manual approval"
+        continue-on-error: true
+  stage-4-approve:
+    needs: [stage-3-create-user, manual-approval]
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.conclusion == 'success' }}
     steps:
       - name: Approve User
         run: echo "User approved"
@@ -44,18 +52,3 @@ jobs:
     steps:
       - name: Reject User
         run: echo "User rejected"
-  stage-6-manual-approval:
-    needs: [stage-4-approve, stage-5-reject]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Manual Approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.token }}
-          approvers: user1,user2,org-team1
-          minimum-approvals: 1
-          issue-title: "Deploying v1.3.5 to prod from staging"
-          issue-body: "Please approve or deny the deployment of version v1.3.5."
-          exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ''
-          additional-denied-words: ''
