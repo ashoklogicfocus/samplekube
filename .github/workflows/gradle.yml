@@ -43,7 +43,7 @@ jobs:
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
     runs-on: self-hosted
-    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.conclusion == 'success' }}
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.result == 'success' }}
     steps:
       - name: Approve User
         run: echo "User approved"
