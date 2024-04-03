@@ -29,7 +29,7 @@ jobs:
         continue-on-error: false
       - name: Set Approval Flag
         if: ${{ always() }}
-        run: echo "::set-output name=approve-user::false"
+        run: echo "::set-output name=approve-user::true"
   manual-approval:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
@@ -46,9 +46,9 @@ jobs:
       - name: Approve User
         run: echo "User approved"
   stage-5-reject:
-    needs: stage-3-create-user
+    needs: stage-4-approve
     runs-on: ubuntu-latest
-    if: ${{ needs.stage-3-create-user.outputs.approve-user != 'true' }}
+    if: ${{ needs.stage-4-approve.result != 'success' }}
     steps:
       - name: Reject User
         run: echo "User rejected"
