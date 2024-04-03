@@ -7,21 +7,21 @@ on:
 
 jobs:
   stage-1-echo:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Echo Stage 1
         run: echo "Stage 1"
 
   stage-2-echo:
     needs: stage-1-echo
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
 
   stage-3-create-user:
     needs: stage-2-echo
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       approve-user: ${{ steps.set-approval-flag.outputs.approve-user }}
     steps:
@@ -35,7 +35,7 @@ jobs:
   
   manual-approval:
     needs: stage-3-create-user
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
     steps:
       - name: Manual Approval
@@ -45,7 +45,7 @@ jobs:
   
   stage-4-run-if-approved:
     needs: manual-approval
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ needs.manual-approval.outputs.result == 'true' }}
     steps:
       - name: Run Stage 4
