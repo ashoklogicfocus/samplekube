@@ -40,6 +40,6 @@ jobs:
       - name: Wait for Approval
         uses: actions/github-script@v5
         with:
-          github-token: 
+          github-token: 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
           script: |
             await github.actions.createApproval(context)
