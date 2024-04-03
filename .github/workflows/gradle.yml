@@ -3,7 +3,7 @@ name: Build and User Approval Workflow
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -15,24 +15,4 @@ jobs:
       - name: Build Application
         run: |
           echo "Building Application"
-        
-
-  create-user-and-approve:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: ashok
-        run: echo "Creating User"
-
-      - name: Await Approval
-        id: approval
-        run: echo "::set-output name=approved::true"
-        continue-on-error: true
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: create-user-and-approve
-    if: ${{ needs.create-user-and-approve.outputs.approved == 'true' }}
-    steps:
-      - name: Deploy Application
-        run: echo "Deploying Application"
+          
