@@ -7,28 +7,28 @@ on:
 
 jobs:
   stage-1-echo:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 1
         run: echo "Stage 1"
 
   stage-2-echo:
     needs: stage-1-echo
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
 
   create-user:
     needs: stage-2-echo
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Create User
         run: echo "Create User"
 
   manual-approval:
     needs: create-user
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: 'Request approval'
         id: approval
@@ -46,7 +46,7 @@ jobs:
 
   run-if-approved:
     needs: manual-approval
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action == 'submitted' && github.event.review.state == 'approved'
     steps:
       - name: Echo Stage 3 (if approved)
@@ -56,7 +56,7 @@ jobs:
 
   run-if-rejected:
     needs: manual-approval
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action == 'submitted' && github.event.review.state == 'changes_requested'
     steps:
       - name: Echo Stage 3 (if rejected)
