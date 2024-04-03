@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        approve-user: [false]
+        approve-user: [true]
       fail-fast: false
     steps:
       - name: Create User
