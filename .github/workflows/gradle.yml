@@ -21,22 +21,36 @@ jobs:
 
   create-user:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    needs: stage-2-echo
     steps:
       - name: Create User
-        run: echo "User created"
-      - name: Request Approval
-        uses: actions/github-script@v4
+        run: echo "Creating User"
+  
+  user-approval:
+    runs-on: ubuntu-latest
+    needs: create-user
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Request approval
+        uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.repos.createStatus({
+            const { data: approvals } = await octokit.rest.actions.listRepoWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: github.sha,
-              state: 'pending',
-              context: 'manual-approval',
-              description: 'Waiting for approval',
-              target_url: 'https://example.com'
-            })
-
+              workflow_id: context.workflow,
+              branch: context.ref.split('/').pop(),
+              per_page: 1,
+              page: 1,
+            });
+            if (approvals.workflow_runs.length > 0) {
+              const runId = approvals.workflow_runs[0].id;
+              await octokit.rest.actions.createWorkflowRunApproval({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId,
+                approval_requester: context.actor,
+              });
+            } else {
+              console.log("No workflow run found to approve.");
+            }
