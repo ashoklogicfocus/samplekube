@@ -15,14 +15,13 @@ jobs:
       - name: Build Application
         run: |
           echo "Building Application"
-          chmod -R 777 gradlew
-          ./gradlew build
+        
 
   create-user-and-approve:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Create User
+      - name: ashok
         run: echo "Creating User"
 
       - name: Await Approval
