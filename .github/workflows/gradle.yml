@@ -9,56 +9,38 @@ jobs:
     steps:
       - name: Echo Stage 1
         run: echo "Stage 1"
+
   stage-2-echo:
     needs: stage-1-echo
     runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
-  stage-3-manual-approval:
+
+  stage-3-create-user:
     needs: stage-2-echo
     runs-on: ubuntu-latest
     steps:
-    - name: Manual Approval
-      if: always() # This step always runs
-      uses: actions/github-script@v4
-      with:
-        github-token: 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
-        script: |
-          const { data: { state } } = await github.repos.getCombinedStatusForRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: context.sha
-          });
+      - name: Create User
+        run: echo "Creating user..."
+        # Add your user creation logic here
 
-          if (state === 'failure') {
-            await github.repos.createStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              description: 'Manual approval provided, continuing with the workflow',
-              context: 'manual-approval'
-            });
-          } else {
-            core.setFailed('Manual approval is needed for this workflow.');
-          }
+  stage-4-manual-approval-reject:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+    steps:
+      - name: Manual Approval Rejected
+        run: echo "Manual approval rejected. Cancelling workflow..."
+        # Add any cleanup or notification logic here
 
-  stage-4-reject:
-    if: success()
-    needs: stage-3-manual-approval
+  stage-5-manual-approval-success:
+    needs: stage-3-create-user
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
-      - name: Reject User
-        run: |
-          # Script to reject user
-          # Assuming it's a placeholder
-  stage-5-approve:
-    if: failure()
-    needs: stage-3-manual-approval
-    runs-on: ubuntu-latest
-    steps:
-      - name: Approve User
-        run: |
-          # Script to approve user
-          # Assuming it's a placeholder
+      - name: Manual Approval Success
+        run: echo "Manual approval success. Continuing with the workflow..."
+        # Add the steps to continue with the workflow after manual approval
+
+
