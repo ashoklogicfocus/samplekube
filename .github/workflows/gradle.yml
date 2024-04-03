@@ -15,17 +15,38 @@ jobs:
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
-  stage-3-create-user:
+  stage-3-manual-approval:
     needs: stage-2-echo
     runs-on: ubuntu-latest
     steps:
-      - name: Create User
-        run: |
-          # Script to create user
-          # Assuming it's a placeholder
+    - name: Manual Approval
+      if: always() # This step always runs
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{ secrets.NPM_TOKEN }}
+        script: |
+          const { data: { state } } = await github.repos.getCombinedStatusForRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.sha
+          });
+
+          if (state === 'failure') {
+            await github.repos.createStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              description: 'Manual approval provided, continuing with the workflow',
+              context: 'manual-approval'
+            });
+          } else {
+            core.setFailed('Manual approval is needed for this workflow.');
+          }
+
   stage-4-reject:
     if: success()
-    needs: stage-3-create-user
+    needs: stage-3-manual-approval
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
@@ -34,7 +55,7 @@ jobs:
           # Assuming it's a placeholder
   stage-5-approve:
     if: failure()
-    needs: stage-3-create-user
+    needs: stage-3-manual-approval
     runs-on: ubuntu-latest
     steps:
       - name: Approve User
