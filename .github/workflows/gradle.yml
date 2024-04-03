@@ -18,33 +18,29 @@ jobs:
   stage-3-create-user:
     needs: stage-2-echo
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        approve-user: [false]
+      fail-fast: false
     steps:
-      - name: ashok
-        run: |
-         # Your user creation logic here
-      # Add other steps here
-
-      # This step will only run if the previous step's output is 'true'
-      - name: Conditional step
-        if: steps.create-user.outputs.result == 'true'
-        run: |
-          # Your conditional logic here
-          
+      - name: Create User
+        id: create-user
+        run: echo "User creation logic here"
+        continue-on-error: true
+      - name: Set Approval Flag
+        if: ${{ always() }}
+        run: echo "::set-output name=approve-user::true"
   stage-4-approve:
-    if: failure()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    steps:
-      - name: Reject User
-        run: |
-          # Script to reject user
-          # Assuming it's a placeholder
-  stage-5-reject:
-    if: success()
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
     steps:
       - name: Approve User
-        run: |
-          # Script to approve user
-          # Assuming it's a placeholder
+        run: echo "User approved"
+  stage-5-reject:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user != 'true' }}
+    steps:
+      - name: Reject User
+        run: echo "User rejected"
