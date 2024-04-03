@@ -1,8 +1,8 @@
 name: User Approval Workflow
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [closed]
+
 jobs:
   stage-1-echo:
     runs-on: ubuntu-latest
@@ -28,7 +28,7 @@ jobs:
   stage-4-manual-approval-reject:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+    if: github.event.pull_request.merged == false
     steps:
       - name: Manual Approval Rejected
         run: echo "Manual approval rejected. Cancelling workflow..."
@@ -37,10 +37,8 @@ jobs:
   stage-5-manual-approval-success:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     steps:
       - name: Manual Approval Success
         run: echo "Manual approval success. Continuing with the workflow..."
-        # Add the steps to continue with the workflow after manual approval
-
-
+        # Add the steps to continue with the workflow after manual approval 
