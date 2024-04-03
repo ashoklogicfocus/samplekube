@@ -1,45 +1,22 @@
-name: User Approval Workflow
+name: master
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
-  stage-1-echo:
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
-      - name: Echo Stage 1
-        run: echo "Stage 1"
-
-  stage-2-echo:
-    needs: stage-1-echo
+      - name: Build
+        run: echo building
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Echo Stage 2
-        run: echo "Stage 2"
-
-  stage-3-create-user:
-    needs: stage-2-echo
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create User
-        run: echo "Creating user..."
-        # Add your user creation logic here
-
-  stage-4-manual-approval-reject:
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == false
-    steps:
-      - name: Manual Approval Rejected
-        run: echo "Manual approval rejected. Cancelling workflow..."
-        # Add any cleanup or notification logic here
-
-  stage-5-manual-approval-success:
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-    steps:
-      - name: Manual Approval Success
-        run: echo "Manual approval success. Continuing with the workflow..."
-        # Add the steps to continue with the workflow after manual approval 
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: trstringer,acdunnigan
+      - name: Deploy to production
+        run: echo deploying
