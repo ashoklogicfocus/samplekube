@@ -18,26 +18,26 @@ jobs:
   stage-3-create-user:
     needs: stage-2-echo
     runs-on: self-hosted
-    strategy:
-      matrix:
-        approve-user: [false]
-      fail-fast: false
+    outputs:
+      approve-user: ${{ steps.set-approval-flag.outputs.approve-user }}
     steps:
       - name: Create User
         id: create-user
         run: echo "User creation logic here"
         continue-on-error: false
       - name: Set Approval Flag
-        if: ${{ always() }}
+        id: set-approval-flag
         run: echo "::set-output name=approve-user::true"
   manual-approval:
     needs: stage-3-create-user
     runs-on: self-hosted
+    outputs:
+      approve-user: ${{ needs.stage-3-create-user.outputs.approve-user }}
     steps:
       - name: Manual Approval
         id: manual-approval
         run: echo "Awaiting manual approval"
-        continue-on-error: false
+        continue-on-error: true
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
     runs-on: self-hosted
@@ -48,7 +48,7 @@ jobs:
   stage-5-reject:
     needs: manual-approval
     runs-on: self-hosted
-    if: ${{ needs.stage-4-approve.result != 'success' }}
+    if: ${{ needs.manual-approval.outputs.approve-user != 'true' }}
     steps:
       - name: Reject User
         run: echo "User rejected"
