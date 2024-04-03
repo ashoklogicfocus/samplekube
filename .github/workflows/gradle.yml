@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Manual Approval
-        id: manual-rejected
+        id: manual-approval
         run: echo "Awaiting manual approval"
         continue-on-error: false
   stage-4-approve:
