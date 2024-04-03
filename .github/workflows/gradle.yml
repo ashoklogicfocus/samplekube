@@ -40,7 +40,7 @@ jobs:
       - name: Manual Approval
         id: manual-approval
         run: echo "Awaiting manual approval"
-        continue-on-error: false
+        continue-on-error: true
 
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
