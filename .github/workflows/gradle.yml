@@ -23,7 +23,7 @@ jobs:
       if: always() # This step always runs
       uses: actions/github-script@v4
       with:
-        github-token: ${{ secrets.NPM_TOKEN }}
+        github-token: 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
         script: |
           const { data: { state } } = await github.repos.getCombinedStatusForRef({
             owner: context.repo.owner,
