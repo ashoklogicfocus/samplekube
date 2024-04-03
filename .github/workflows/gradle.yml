@@ -14,11 +14,23 @@ jobs:
 
       - name: Build Application
         run: |
-          echo "Building Application" 
+          echo "Building Application"
 
   user_approval:
     runs-on: ubuntu-latest
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Request User Approval
-        run: echo "Requesting User Approval"
+        id: approval
+        uses: myorg/my-approval-action@v1
+        with:
+          message: "Do you approve this build?"
+      - name: Check Approval
+        run: |
+          if [[ "${{ steps.approval.outputs.approved }}" == "yes" ]]; then
+            echo "User approved the build"
+          else
+            echo "User did not approve the build"
+            exit 1
+          fi
