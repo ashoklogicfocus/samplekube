@@ -1,36 +1,43 @@
-name: Build and User Approval Workflow
-
+name: User Approval Workflow
 on:
   push:
     branches:
-      - master
-
+      - main
 jobs:
-  build:
+  stage-1-echo:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build Application
-        run: |
-          echo "Building Application"
-
-  user_approval:
+      - name: Echo Stage 1
+        run: echo "Stage 1: Echo"
+  stage-2-echo:
+    needs: stage-1-echo
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
-      - name: Request User Approval
-        id: approval
-        uses: myorg/my-approval-action@v1
-        with:
-          message: "Do you approve this build?"
-      - name: Check Approval
+      - name: Echo Stage 2
+        run: echo "Stage 2: Echo"
+  stage-3-create-user:
+    needs: stage-2-echo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create User
         run: |
-          if [[ "${{ steps.approval.outputs.approved }}" == "yes" ]]; then
-            echo "User approved the build"
-          else
-            echo "User did not approve the build"
-            exit 1
-          fi
+          # Script to create user
+          # Assuming it's a placeholder
+  stage-4-reject:
+    if: failure()
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject User
+        run: |
+          # Script to reject user
+          # Assuming it's a placeholder
+  stage-5-approve:
+    if: success()
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
