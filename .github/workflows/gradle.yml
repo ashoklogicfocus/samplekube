@@ -44,3 +44,20 @@ jobs:
     steps:
       - name: Reject User
         run: echo "User rejected"
+  stage-6-manual-approval:
+    needs: [stage-4-approve, stage-5-reject]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual Approval
+        id: manual-approval
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequest } = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            console.log(`Approve ${pullRequest.title}`);
+            return;
