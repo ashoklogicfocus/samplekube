@@ -1,6 +1,8 @@
-name: master
+name: User Approval Workflow
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -16,7 +18,7 @@ jobs:
     steps:
       - uses: trstringer/manual-approval@v1
         with:
-          secret: ${{ github.TOKEN }}
+          secret: ${{ NPM_TOKEN }}
           approvers: trstringer,acdunnigan
       - name: Deploy to production
         run: echo deploying
