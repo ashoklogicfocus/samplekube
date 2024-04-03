@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: trstringer/manual-approval@v1
         with:
-          secret: ${{ NPM_TOKEN }}
+          secret: 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
           approvers: trstringer,acdunnigan
       - name: Deploy to production
         run: echo deploying
