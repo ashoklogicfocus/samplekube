@@ -2,61 +2,29 @@ name: User Approval Workflow
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   stage-1-echo:
     runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 1
-        run: echo "Stage 1"
+        run: echo "Stage 1: Echo"
   stage-2-echo:
     needs: stage-1-echo
     runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 2
-        run: echo "Stage 2"
+        run: echo "Stage 2: Echo"
   stage-3-create-user:
     needs: stage-2-echo
     runs-on: ubuntu-latest
     steps:
-      - name: Manual Approval
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
-        uses: actions/github-script@v5
-        with:
-          github-token: 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
-          script: |
-            const { data: runs } = await github.actions.listRepoWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: context.workflow,
-              status: 'success',
-              per_page: 1,
-            });
-
-            const run = runs[0];
-            if (run) {
-              const approvals = await github.actions.listWorkflowRunApprovals({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                run_id: run.id,
-              });
-
-              if (approvals.total_count === 0) {
-                await github.actions.createWorkflowRunApproval({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: run.id,
-                });
-              }
-            }
-
       - name: Create User
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.approvals.length > 0
         run: |
           # Script to create user
           # Assuming it's a placeholder
   stage-4-reject:
-    if: failure()
+    if: success()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
@@ -65,13 +33,11 @@ jobs:
           # Script to reject user
           # Assuming it's a placeholder
   stage-5-approve:
-    if: success()
+    if: failure()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Approval
-        uses: actions/github-script@v5
-        with:
-          github-token: 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
-          script: |
-            await github.actions.createApproval(context)
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
