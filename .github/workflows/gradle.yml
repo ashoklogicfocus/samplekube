@@ -5,19 +5,19 @@ on:
       - master
 jobs:
   stage-1-echo:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Echo Stage 1
         run: echo "Stage 1"
   stage-2-echo:
     needs: stage-1-echo
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
   stage-3-create-user:
     needs: stage-2-echo
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         approve-user: [false]
@@ -40,14 +40,14 @@ jobs:
         continue-on-error: false
   stage-4-approve:
     needs: [stage-3-create-user, manual-approval]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.conclusion == 'success' }}
     steps:
       - name: Approve User
         run: echo "User approved"
   stage-5-reject:
-    needs: stage-4-approve
-    runs-on: ubuntu-latest
+    needs: manual-approval
+    runs-on: self-hosted
     if: ${{ needs.stage-4-approve.result != 'success' }}
     steps:
       - name: Reject User
