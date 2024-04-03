@@ -51,6 +51,8 @@ jobs:
     steps:
       - name: Echo Stage 3 (if approved)
         run: echo "Stage 3 (if approved)"
+        env:
+          ENV_VARIABLE_NAME: "NPM_TOKEN"
 
   run-if-rejected:
     needs: manual-approval
