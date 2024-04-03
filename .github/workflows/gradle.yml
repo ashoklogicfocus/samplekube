@@ -34,7 +34,7 @@ jobs:
         id: approval
         uses: actions/github-script@v5
         with:
-          github-token: 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
+          github-token: ${{ secrets.NPM_TOKEN }}
           script: |
             const { data: { html_url } } = await github.pulls.createReview({
               owner: context.repo.owner,
