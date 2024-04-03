@@ -1,52 +1,54 @@
 name: User Approval Workflow
-
 on:
   push:
     branches:
       - master
-
 jobs:
   stage-1-echo:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 1
         run: echo "Stage 1"
-
   stage-2-echo:
     needs: stage-1-echo
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 2
         run: echo "Stage 2"
-
   stage-3-create-user:
     needs: stage-2-echo
-    runs-on: self-hosted
-    outputs:
-      approve-user: ${{ steps.set-approval-flag.outputs.approve-user }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        approve-user: [false]
+      fail-fast: false
     steps:
       - name: Create User
         id: create-user
         run: echo "User creation logic here"
         continue-on-error: false
       - name: Set Approval Flag
-        id: set-approval-flag
+        if: ${{ always() }}
         run: echo "::set-output name=approve-user::true"
-  
   manual-approval:
     needs: stage-3-create-user
     runs-on: self-hosted
-    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
     steps:
       - name: Manual Approval
         id: manual-approval
         run: echo "Awaiting manual approval"
         continue-on-error: false
-  
-  stage-4-run-if-approved:
-    needs: manual-approval
-    runs-on: self-hosted
-    if: ${{ needs.manual-approval.outputs.result == 'true' }}
+  stage-4-approve:
+    needs: [stage-3-create-user, manual-approval]
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' && needs.manual-approval.conclusion == 'success' }}
     steps:
-      - name: Run Stage 4
-        run: echo "Stage 4"
+      - name: Approve User
+        run: echo "User approved"
+  stage-5-reject:
+    needs: stage-4-approve
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-4-approve.result != 'success' }}
+    steps:
+      - name: Reject User
+        run: echo "User rejected"
