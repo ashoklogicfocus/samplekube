@@ -23,7 +23,7 @@ jobs:
         run: |
           # Script to create user
           # Assuming it's a placeholder
-  stage-4-reject:
+  stage-4-approve:
     if: failure()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
         run: |
           # Script to reject user
           # Assuming it's a placeholder
-  stage-5-approve:
+  stage-5-reject:
     if: success()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
