@@ -29,7 +29,7 @@ jobs:
         continue-on-error: true
       - name: Set Approval Flag
         if: ${{ always() }}
-        run: echo "::set-output name=approve-user::true"
+        run: echo "::set-output name=approve-user::false"
   stage-4-approve:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
