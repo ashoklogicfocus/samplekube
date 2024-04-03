@@ -22,13 +22,32 @@ jobs:
           # Your script to create a user goes here
           echo "Creating User"
       
+      - name: Set User Approval Status
+        id: set_user_approval_status
+        run: |
+          # Your script to set the user approval status (accept or reject) goes here
+          echo "::set-output name=status::accept" # Set to 'reject' to reject user approval
+
   user_approval:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push' && github.event.pull_request.head.ref == 'master'
     steps:
-      - name: User Approval
-        id: user_approval
-        run: |
-          # Your script for user approval goes here
-          echo "User Approved"
+      - name: Wait for Build Job
+        id: wait_for_build
+        run: echo "Waiting for Build Job to complete"
+
+      - name: Check User Approval Status
+        id: check_user_approval
+        if: needs.build.outputs.status == 'accept'
+        run: echo "User Approval is accepted, proceeding to next stage"
+      
+  rejected_approval:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.event.pull_request.head.ref == 'master'
+    steps:
+      - name: Check User Approval Status
+        id: check_user_approval
+        if: needs.build.outputs.status == 'reject'
+        run: echo "User Approval is rejected, skipping next stage"
