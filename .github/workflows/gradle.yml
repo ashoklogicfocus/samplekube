@@ -45,4 +45,3 @@ jobs:
         if: steps.approval.outputs.approved != 'true'
         run: |
           Write-Host 'Deployment rejected. Stopping the workflow.'
-
