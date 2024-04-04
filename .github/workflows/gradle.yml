@@ -17,7 +17,7 @@ jobs:
     runs-on: self-hosted
     needs: stage-1-echo
     steps:
-      - uses: ashoklogicfocus/samplekube@v1
+      - uses: ashoklogicfocus/samplekube@v1.0.0
         with:
           secret: ${{ secrets.NEW_TOKEN }}
           approvers: trstringer,acdunnigan
