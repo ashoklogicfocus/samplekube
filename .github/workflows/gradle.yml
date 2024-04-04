@@ -23,7 +23,7 @@ jobs:
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ secrets.NEW_TOKEN }}
-          approvers: trstringer,sarakishore
+          approvers: trstringer,acdunnigan
       - name: Deploy to production
         run: echo deploying
 
