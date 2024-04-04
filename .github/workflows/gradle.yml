@@ -16,30 +16,32 @@ jobs:
           Write-Host 'Done some pre dev env deploy work'
 
   Dev-Env:
+    name: deploy
     runs-on: ubuntu-latest
     needs: Pre-Dev-Steps
-    environment:
-      name: DEVENV
     steps:
-      - name: 'Run some dev env steps'
-        shell: pwsh
-        run: |
-          Write-Host 'Done some dev env deploy work'
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: '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'
+          approvers: trstringer,acdunnigan
+      - name: Deploy to production
+        run: echo deploying
 
   Pre-env:
     runs-on: ubuntu-latest
+    if: ${{ github.event.review.status == 'approved' }}
     needs: Dev-Env
     steps:
-      - name: 'Run some predev steps'
+      - name: 'Run approved steps'
         shell: pwsh
         run: |
           Write-Host 'Done some pre dev env deploy work'
   Pr-as:
     runs-on: ubuntu-latest
+    if: ${{ github.event.review.status != 'approved' }}
     needs:  Dev-Env
-
     steps:
-      - name: 'Run some predev steps'
+      - name: 'Run not approved steps'
         shell: pwsh
         run: |
           Write-Host 'Done some pre dev env deploy work'
