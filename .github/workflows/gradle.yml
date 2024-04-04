@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: 'Manual approval required'
         id: approval
-        uses: tzkhan/approvals@v2
+        uses: trstringer/manual-approval@v1
         with:
           message: 'Approve or reject this deployment.'
       - name: 'Check approval status'
