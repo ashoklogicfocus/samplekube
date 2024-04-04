@@ -6,18 +6,16 @@ on:
       - master
 
 jobs:
-  Pre-Dev-Steps:
-    runs-on: self-hosted
+  stage-1-echo:
+    runs-on: ubuntu-latest
     steps:
-      - name: 'Run some predev steps'
-        shell: pwsh
-        run: |
-          Write-Host 'Done some pre dev env deploy work'
+      - name: Echo Stage 1
+        run: echo "Stage 1"
 
   Dev-Env:
     name: deploy
     runs-on: self-hosted
-    needs: Pre-Dev-Steps
+    needs: stage-1-echo
     steps:
       - uses: trstringer/manual-approval@v1
         with:
