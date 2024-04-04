@@ -1,38 +1,14 @@
-name: User Approval Workflow
+name: Manual Approval Demo
 
 on:
-  push:
-    branches:
-      - master
-
+  workflow_dispatch:
+    
 jobs:
-  build:
+  Pre-Dev-Steps:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build
-        run: echo "Building the application..."
-
-      - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: echo "Deploying the application..."
-
-  approval:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Approve deployment
-        id: approve
-        run: echo "Please approve the deployment by leaving a comment on this pull request."
-
-      - name: Check approval
-        if: steps.approve.outputs.approved == 'true'
-        run: echo "Deployment approved! Proceeding with deployment..."
-
-      - name: Deploy
-        if: steps.approve.outputs.approved == 'true'
-        run: echo "Deploying the application..."
-
+      - name: 'Run some predev steps'
+        shell: pwsh
+        run: |
+          Write-Host 'Done some pre dev env deploy work'
