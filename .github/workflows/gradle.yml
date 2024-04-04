@@ -24,8 +24,12 @@ jobs:
         with:
           secret: ${{ secrets.NEW_TOKEN }}
           approvers: trstringer,acdunnigan
-      - name: Deploy to production
-        run: echo deploying
+          minimum-approvals: 1
+          issue-title: 'Approval Required for Deployment'
+          issue-body: 'Please review and approve this deployment.'
+          exclude-workflow-initiator-as-approver: false
+          additional-approved-words: ''
+          additional-denied-words: ''
 
   Pre-env:
     runs-on: ubuntu-latest
