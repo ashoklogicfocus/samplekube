@@ -22,8 +22,8 @@ jobs:
     steps:
       - uses: trstringer/manual-approval@v1
         with:
-          secret: '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'
-          approvers: trstringer,acdunnigan
+          secret: ${{ NEW_TOKEN }}
+          approvers: trstringer,sarakishore
       - name: Deploy to production
         run: echo deploying
 
