@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pre-Dev-Steps:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: 'Run some predev steps'
@@ -17,7 +17,7 @@ jobs:
 
   Dev-Env:
     name: deploy
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: Pre-Dev-Steps
     steps:
       - uses: trstringer/manual-approval@v1
@@ -28,7 +28,7 @@ jobs:
         run: echo deploying
 
   Pre-env:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ github.event.review.status == 'approved' }}
     needs: Dev-Env
     steps:
@@ -37,7 +37,7 @@ jobs:
         run: |
           Write-Host 'Done some pre dev env deploy work'
   Pr-as:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ github.event.review.status != 'approved' }}
     needs:  Dev-Env
     steps:
