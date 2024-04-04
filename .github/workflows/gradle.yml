@@ -3,7 +3,7 @@ name: User Approval Workflow
 on: 
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -33,7 +33,6 @@ jobs:
         id: approval
         uses: "actions/github-script@v5"
         with:
-          github-token: ${{ secrets.NPM_TOKEN }}
           script: |
             const { data: approvals } = await github.rest.pulls.listReviews({
               owner: context.repo.owner,
