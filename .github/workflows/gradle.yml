@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: trstringer/manual-approval@v1
         with:
-          secret: ${{ NEW_TOKEN }}
+          secret: ${{ secrets.NEW_TOKEN }}
           approvers: trstringer,sarakishore
       - name: Deploy to production
         run: echo deploying
