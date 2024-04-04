@@ -27,38 +27,22 @@ jobs:
           Write-Host 'Done some dev env deploy work'
 
   User-Approval:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: Dev-Env
-    if: always()
     steps:
-      - name: 'Request user approval'
+      - name: 'Manual approval required'
         id: approval
-        uses: "actions/github-script@v6"
+        uses: tzkhan/approvals@v2
         with:
-          script: |
-            const { data: approvals } = await github.repos.listAppsWithAccessToProtectedBranch({
-              ...context.repo,
-              branch: context.payload.ref.replace('refs/heads/', '')
-            });
-
-            const approver = approvals.find(approval => approval.slug === 'approved-slug'); // Replace 'approved-slug' with your approver's GitHub username
-
-            if (!approver) {
-              throw new Error('Approver not found');
-            }
-
-            const { data: reviews } = await github.pulls.listReviews({
-              ...context.repo,
-              pull_number: context.payload.pull_request.number
-            });
-
-            const approvedReview = reviews.find(review => review.user.login === approver.login && review.state === 'APPROVED');
-
-            if (!approvedReview) {
-              throw new Error('Approval not granted');
-            }
-
-            console.log('Approval granted');
-        env:
-          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
+          message: 'Approve or reject this deployment.'
+      - name: 'Check approval status'
+        if: steps.approval.outputs.approved == 'true'
+        run: |
+          Write-Host 'Deployment approved. Proceeding with deployment.'
+          # Add your deployment steps here
+      - name: 'Handle rejection'
+        if: steps.approval.outputs.approved != 'true'
+        run: |
+          Write-Host 'Deployment rejected. Stopping the workflow.'
 
